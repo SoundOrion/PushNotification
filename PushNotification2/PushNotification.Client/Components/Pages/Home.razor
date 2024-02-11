@@ -41,15 +41,23 @@
 
     public async Task subscribePushNotification()
     {
+
         subscription = await JSRuntime.InvokeAsync<NotificationSubscription>("blazorPushNotifications.requestSubscription");
         if (subscription is not null)
         {
-            //ここ本当はユニークにしたり、ちゃんとする
-            subscription.NotificationSubscriptionId = 1;
-            subscription.UserId = "anonymous";
+            try
+            {
+                //ここ本当はユニークにしたり、ちゃんとする
+                subscription.NotificationSubscriptionId = 1;
+                subscription.UserId = "anonymous";
 
-            //サーバー側にsubscription情報を通知する
-            await OrdersClient.SubscribeToNotifications(subscription);
+                //サーバー側にsubscription情報を通知する
+                await OrdersClient.SubscribeToNotifications(subscription);
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                //リトライとか？？
+            }
         }
     }
 
